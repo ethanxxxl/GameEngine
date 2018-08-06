@@ -8,15 +8,19 @@ class Body
 {
 private:
 	std::vector<float> vertices;
-	Shader bodyShaderProgram;
-	
+	std::vector<float> indices;
+	Shader shaderProgram;
+
+	unsigned int VAO;
+
 public:
 	// grabs an std::vector of vertices
 	void setVertices(std::vector<float> verts);
 
-	void loadModel();
+	// gets the shader program to use
+	void setShaderProgram(Shader newProgram);
 
-	void setShaderProgram(Shader shaderProgram);
+	void load();
 
 	void draw();
 };
