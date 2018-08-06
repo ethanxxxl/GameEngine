@@ -9,13 +9,17 @@ void Body::setVertices(std::vector<float> verts)
 	vertices = verts;
 }
 
+void Body::setIndices(std::vector<float> ind)
+{
+	indices = ind;
+}
 void Body::setShaderProgram(Shader newProgram)
 {
 	shaderProgram = newProgram;
 }
 
 /**
- * This function is responsible for making sure that all of the body vertex
+ * @brief This method is responsible for making sure that all of the body vertex
  *  and other data is put away in buffers and bound to the VAO so that the object
  *  can easily be drawn with the draw() function.
  */
@@ -23,7 +27,7 @@ void Body::load()
 {
 	// create handles for the buffer object and the element buffer object
 	unsigned int VBO, EBO;
-	
+
 	// create the body vertex array and then bind it
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
@@ -33,8 +37,8 @@ void Body::load()
 
 	// TODO: finish putting everything in the buffers properly.
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER,
-	
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices.data()), vertices.data(), GL_STATIC_DRAW);
+
 	// unbind the vertex array
 	glBindVertexArray(0);
 }
