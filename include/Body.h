@@ -18,13 +18,14 @@ public:
 	void setVertices(std::vector<float> verts);
 
 	// grabs an std::vector of indices
-	void setIndices(std::vector<float> ind);
+	void setIndices(std::vector<float> inds);
 
 	void setVertexAttribute(GLuint index,
 							GLint size,
 							GLenum type,
+							GLenum normalize,
 							GLsizei stride,
-							constGLvoid *pointer)
+							const void *pointer);
 	
 
 	// gets the shader program to use
@@ -32,7 +33,7 @@ public:
 
 	void load();
 
-	void draw();
+	void draw(int num_verts, int num_inds);
 
 	Body();
 };
