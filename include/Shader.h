@@ -4,6 +4,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include <glm/glm.hpp>
+
 #include <vector>
 #include <string>
 
@@ -17,7 +19,7 @@ private:
 	unsigned int shaderProgram;
 
 public:
-	// adds shaders to the list and compiles them
+	/// adds shaders to the list and compiles them.
 	void grabShader(GLenum shaderType, std::string filename);
 
 	// attaches the compiled shaders from the list, links the program, and
@@ -25,6 +27,10 @@ public:
 	void createProgram();
 
 	void useProgram();
+
+	int getUniformLocation(std::string name);
+
+	unsigned int getID();
 };
 
 #endif

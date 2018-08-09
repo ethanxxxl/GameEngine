@@ -92,3 +92,13 @@ void Shader::useProgram()
 {
 	glUseProgram(shaderProgram);
 }
+
+int Shader::getUniformLocation(std::string name)
+{
+	return glGetUniformLocation(shaderProgram, name.c_str());
+}
+
+unsigned int Shader::getID()
+{
+	return shaderProgram;
+}
