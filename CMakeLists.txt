@@ -11,3 +11,4 @@ include(src/CMakeLists.txt)
 
 target_link_libraries( run ${GL_LIBS} )
 target_include_directories( run PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include )
+target_compile_options(run PUBLIC -g)
