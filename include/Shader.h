@@ -8,6 +8,8 @@
 
 #include <vector>
 #include <string>
+#include <tuple>
+#include <map>
 
 class Shader
 {
@@ -16,7 +18,14 @@ private:
 	//  when createProgram is called
 	std::vector<GLuint> shaderObjects;
 	
+	/// the handle for the shader program
 	unsigned int shaderProgram;
+
+	/// names of all of the unforms in the shader program
+	typedef std::map<std::string, std::pair<int, GLenum>> uniform_list_t;
+	uniform_list_t uniforms;
+
+	inline int getUniLoc(std::string name);
 
 public:
 	/// adds shaders to the list and compiles them.
@@ -28,9 +37,22 @@ public:
 
 	void useProgram();
 
+	unsigned int getID();
+
 	int getUniformLocation(std::string name);
 
-	unsigned int getID();
-};
+	void genUniformList();
+	
+	const uniform_list_t& getUniforms();
 
+
+	/// changes a uniform variable.
+	template <typename T>
+	void accessUniform(std::string uniform_name, T data);
+
+	/// changes a matrix uniform variable.
+	template <typename T>
+	void accessUniform(std::string name, GLsizei count, T);
+
+};
 #endif
