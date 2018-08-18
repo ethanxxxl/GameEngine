@@ -5,4 +5,5 @@ target_sources(run
 	"${CMAKE_CURRENT_LIST_DIR}/Shader.cpp"
 	"${CMAKE_CURRENT_LIST_DIR}/stb_image.cpp"
 	"${CMAKE_CURRENT_LIST_DIR}/Body.cpp"
+	"${CMAKE_CURRENT_LIST_DIR}/Camera.cpp"
 	)
