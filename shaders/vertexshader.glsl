@@ -6,5 +6,5 @@ uniform mat4 clip_matrix;
 
 void main()
 {
-	gl_Position =  clip_matrix * vec4(aPos, 1.0f);
+	gl_Position = clip_matrix * vec4(aPos, 1.0f);
 }
