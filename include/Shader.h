@@ -5,11 +5,13 @@
 #include <GLFW/glfw3.h>
 
 #include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include <vector>
 #include <string>
 #include <tuple>
 #include <map>
+#include <iostream>
 
 class Shader
 {
@@ -25,9 +27,16 @@ private:
 	typedef std::map<std::string, std::pair<int, GLenum>> uniform_list_t;
 	uniform_list_t uniforms;
 
-	inline int getUniLoc(std::string name);
+	/// simle helper function for less typing
+	int getUniLoc(std::string name);
+
+	///
+	std::string matrix_uniform_name;
 
 public:
+	/// makes sure the shader has a matrix uniform variable.
+	Shader(std::string name);
+
 	/// adds shaders to the list and compiles them.
 	void grabShader(GLenum shaderType, std::string filename);
 
@@ -35,24 +44,12 @@ public:
 	//  clears out the shaderObjects vector.
 	void createProgram();
 
+	/// activates the program
 	void useProgram();
 
 	unsigned int getID();
 
-	int getUniformLocation(std::string name);
-
-	void genUniformList();
-	
-	const uniform_list_t& getUniforms();
-
-
-	/// changes a uniform variable.
-	template <typename T>
-	void accessUniform(std::string uniform_name, T data);
-
-	/// changes a matrix uniform variable.
-	template <typename T>
-	void accessUniform(std::string name, GLsizei count, T);
-
+	const std::string getMatrixUniformName();
 };
+
 #endif

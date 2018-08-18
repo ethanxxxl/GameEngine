@@ -9,23 +9,97 @@
 #include <vector>
 #include <string>
 
-Body::Body()
+#include <Uniform.h>
+
+Body::Body() : shader_program("clip_matrix")
 {
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
 	glGenBuffers(1, &EBO);
-	useElements = false;
+	use_elements = false;
+
+	shader_program.grabShader(GL_VERTEX_SHADER, "../shaders/default/vertextshader.glsl");
+	shader_program.grabShader(GL_FRAGMENT_SHADER, "../shaders/default/vertextshader.glsl");
+	shader_program.createProgram();
 }
 
-void Body::setVertices(std::vector<float> verts)
+
+Body::Body(std::vector<float> *verts, GLenum usage = GL_STATIC_DRAW) : shader_program("clip_matrix")
 {
+	glGenVertexArrays(1, &VAO);
+	glGenBuffers(1, &VBO);
+
+	// set up the draw function to use glDrawElements()
+	use_elements = false;
+
+	// moves copys the pointer to the obect so the object knows where its data
+	//  is (may not be needed)
 	vertices = verts;
+	
+	// binds the object VAO
+	glBindVertexArray(VAO);
+
+	// put the new vertex data in the buffer.
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER,
+				 sizeof(vertices->data()) * vertices->size(),
+				 vertices->data(),
+				 usage
+				 );
+
+	// unbinds the object VAO to make sure it doesn't get screwed up by
+	//  something else outside of the object class.
+	glBindVertexArray(0);
+
+	shader_program.grabShader(GL_VERTEX_SHADER, "../shaders/default/vertextshader.glsl");
+	shader_program.grabShader(GL_FRAGMENT_SHADER, "../shaders/default/vertextshader.glsl");
+	shader_program.createProgram();
 }
 
-void Body::setIndices(std::vector<unsigned int> inds)
+
+Body::Body(std::vector<float> *verts,
+		   std::vector<unsigned int> *inds,
+		   GLenum usage = GL_STATIC_DRAW
+		   )
+		   : shader_program("clip_matrix")
 {
-	indices = inds;
-	useElements = true;
+	// generate the buffers and array object.
+	glGenVertexArrays(1, &VAO);
+	glGenBuffers(1, &VBO);
+	glGenBuffers(1, &EBO);
+
+	// set up the draw function to use glDrawElements()
+	use_elements = true;
+
+	// moves copys the pointer to the obect so the object knows where its data
+	//  is (may not be needed)
+	vertices = verts;
+
+	// binds the object VAO
+	glBindVertexArray(VAO);
+
+	// put the new vertex data in the buffer.
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER,
+				 sizeof(vertices->data()) * vertices->size(),
+				 vertices->data(),
+				 usage
+				 );
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+				 sizeof(indices->data()) * indices->size(),
+				 indices->data(),
+				 usage
+				 );
+
+	// unbinds the object VAO to make sure it doesn't get screwed up by
+	//  something else outside of the object class.
+	glBindVertexArray(0);
+
+	shader_program.grabShader(GL_VERTEX_SHADER, "../shaders/default/vertextshader.glsl");
+	shader_program.grabShader(GL_FRAGMENT_SHADER, "../shaders/default/vertextshader.glsl");
+	shader_program.createProgram();
 }
 
 /*!
@@ -45,6 +119,8 @@ void Body::setVertexAttribute(GLuint index,
 	glEnableVertexAttribArray(index);
 	glVertexAttribPointer(index, size, type, normalize, stride, pointer);
 	glBindVertexArray(0);
+
+	num_model_verts = vertices->size() / stride;
 }
 
 /*!
@@ -52,7 +128,7 @@ void Body::setVertexAttribute(GLuint index,
  */
 void Body::setShaderProgram(Shader newProgram)
 {
-	shaderProgram = newProgram;
+	shader_program = newProgram;
 }
 
 /*!
@@ -60,50 +136,83 @@ void Body::setShaderProgram(Shader newProgram)
  *  Object. this funcion also binds the body Vertex Array Object so it can be
  *  used when drawing the body in the draw method.
  */
-void Body::load()
+
+void Body::load(std::vector<float> *verts, GLenum usage = GL_STATIC_DRAW)
 {
-	// Bind the body vertex array
+	// moves copys the pointer to the obect so the object knows where its data
+	//  is (may not be needed)
+	vertices = verts;
+
+	// sets the draw mode for the draw function
+	use_elements = false;
+	
+	// binds the object VAO
 	glBindVertexArray(VAO);
 
-	// puts the vertex data into the vertex buffer
+	// put the new vertex data in the buffer.
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices.data()) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER,
+				 sizeof(vertices->data()) * vertices->size(),
+				 vertices->data(),
+				 usage
+				 );
 
-	// creates a element buffer object if there is index data to put in the
-	//  buffer
-	if ( useElements )
-	{
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices.data()), indices.data(), GL_STATIC_DRAW);
-	}
-
-	// unbind the vertex array
+	// unbinds the object VAO to make sure it doesn't get screwed up by
+	//  something else outside of the object class.
 	glBindVertexArray(0);
 }
 
-void Body::draw(int num_verts, std::string mat_uniform_name)
+void Body::load(std::vector<float> *verts,
+				std::vector<unsigned int> *inds,
+				GLenum usage = GL_STATIC_DRAW
+				)
 {
-	shaderProgram.useProgram();
+	// moves copys the pointer to the obect so the object knows where its data
+	//  is (may not be needed)
+	vertices = verts;
+
+	// sets the draw mode for the draw function
+	use_elements = false;
+	
+	// binds the object VAO
 	glBindVertexArray(VAO);
 
-	// if the user wants to move the camera/object arount, then they need to
-	//  provide the uniform name so that it can be sent over.
-	if ( !mat_uniform_name.empty() )
-	{
-		glUniformMatrix4fv(shaderProgram.getUniformLocation(mat_uniform_name),
-						   1,
-						   GL_FALSE,
-						   glm::value_ptr(clip_mat)
-						   );
-	}
+	// put the new vertex data in the buffer.
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER,
+				 sizeof(vertices->data()) * vertices->size(),
+				 vertices->data(),
+				 usage
+				 );
 
-	if ( useElements )
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+				 sizeof(indices->data()) * indices->size(),
+				 indices->data(),
+				 usage
+				 );
+
+	// unbinds the object VAO to make sure it doesn't get screwed up by
+	//  something else outside of the object class.
+	glBindVertexArray(0);
+
+}
+
+void Body::draw(glm::mat4 proj_view)
+{
+	shader_program.useProgram();
+	glBindVertexArray(VAO);
+
+	clip_matrix.aquire(shader_program.getMatrixUniformName(), shader_program.getID());
+	clip_matrix.setData(model * proj_view);
+
+	if ( use_elements )
 	{
-		glDrawElements(GL_TRIANGLES, num_verts, GL_FLOAT, 0);
+		glDrawElements(GL_TRIANGLES, num_model_verts, GL_FLOAT, 0);
 	}
 	else
 	{
-		glDrawArrays(GL_TRIANGLES, 0, num_verts);
+		glDrawArrays(GL_TRIANGLES, 0, num_model_verts);
 	}
 
 	glBindVertexArray(0);
@@ -122,19 +231,4 @@ void Body::rotate(float angle, glm::vec3 axis)
 void Body::translate(glm::vec3 translation)
 {
 	glm::translate(model, translation);
-}
-
-glm::mat4 Body::getClipMatrix(glm::mat4 proj, glm::mat4 view)
-{
-	clip_mat =  proj * view * model;
-	for ( int x = 0; x < 3; x++)
-	{
-		for ( int y = 0; y < 3; y++ )
-		{
-			std::cout << view[y][x] << " ";
-		}
-		std::cout << std::endl;
-	}
-
-	return clip_mat;
 }

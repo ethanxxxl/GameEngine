@@ -8,6 +8,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <Body.h>
 #include <Shader.h>
+#include <Camera.h>
 
 // this function gets called every time the window is resized, and so the
 //  viewport will be updated everytime the windows size changes.
@@ -58,11 +59,6 @@ int main()
 	 * SHADERS
 	 */
 
-	Shader shaderProgram;
-	shaderProgram.grabShader(GL_VERTEX_SHADER, "shaders/vertexshader.glsl");
-	shaderProgram.grabShader(GL_FRAGMENT_SHADER, "shaders/fragmentshader.glsl");
-	shaderProgram.createProgram();
-
 	/*
 	 * Draw Data
 	 */
@@ -110,25 +106,13 @@ int main()
     -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
     -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
 };
-
-	std::vector<unsigned int> indices =
-	{
-		0, 1, 3,
-		1, 2, 3
-	};
-
-	glm::mat4 projection;
-	projection = glm::perspective(glm::radians(45.0f), (float)(800 / 600), 0.1f, 100.0f);
-
-	glm::mat4 view;
-	view = glm::lookAt(glm::vec3(2, 2, 2), glm::vec3(0, 0, 0), glm::vec3(0,0,1));
-
-	Body cube;
-	cube.setVertices(vertices);
-	cube.setShaderProgram(shaderProgram);
-	cube.load();
+	Body cube(&vertices, GL_STATIC_DRAW);
 	cube.setVertexAttribute(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), 0);
-	cube.getClipMatrix(projection, view);
+
+	//Camera(glm::vec3 eye, glm::vec3 direction, float fov, float aspect, float near, float far);
+	Camera cam1(glm::vec3(2, 2, 2), glm::vec3(0, 0, 0), 45.0f, 800 / 600, 0.01f, 10.0f);
+	cam1.activate();
+	cam1.addBody(&cube);
 
 
 	/*
@@ -144,8 +128,8 @@ int main()
 		glClearColor(0.16f, 0.23f, 0.35f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		cube.getClipMatrix(projection, view);
-		cube.draw(36, "clip_matrix");
+		cam1.drawAll();
+
 
 		// input handler
 		processInput(window);

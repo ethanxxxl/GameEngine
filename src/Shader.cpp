@@ -8,6 +8,11 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+Shader::Shader(std::string name)
+{
+	matrix_uniform_name = name;
+}
+
 void Shader::grabShader(GLenum shaderType, std::string filename)
 {
 	// creates an fstream object for the shader source. it also opens the file
@@ -97,180 +102,51 @@ void Shader::useProgram()
 	glUseProgram(shaderProgram);
 }
 
-int Shader::getUniformLocation(std::string name)
-{
-	return glGetUniformLocation(shaderProgram, name.c_str());
-}
-
 unsigned int Shader::getID()
 {
 	return shaderProgram;
 }
 
-void Shader::genUniformList()
-{
-	// gets the total number of active uniforms.
-	int active_uniforms;
-	glGetProgramiv(shaderProgram, GL_ACTIVE_UNIFORMS, &active_uniforms);
-	// maximum size that will need allocated to store the longest uniform
-	//  variables name.
-	int buffer_size;
-	glGetProgramiv(shaderProgram, GL_ACTIVE_UNIFORM_MAX_LENGTH, &buffer_size);
+//void Shader::genUniformList()
+//{
+//	// gets the total number of active uniforms.
+//	int active_uniforms;
+//	glGetProgramiv(shaderProgram, GL_ACTIVE_UNIFORMS, &active_uniforms);
+//	// maximum size that will need allocated to store the longest uniform
+//	//  variables name.
+//	int buffer_size;
+//	glGetProgramiv(shaderProgram, GL_ACTIVE_UNIFORM_MAX_LENGTH, &buffer_size);
+//
+//	// the size of the uniform variable in the shader program
+//	int uniform_size;
+//	// the type of the uniform in the shader program.
+//	GLenum uniform_type;
+//	// the name of the uniform in the shader program.
+//	std::string uniform_name;
+//	uniform_name.reserve(buffer_size);
+//	
+//	for ( unsigned int i = 0; i < active_uniforms; i++ )
+//	{
+//		glGetActiveUniform(shaderProgram,
+//						   i,
+//						   buffer_size,
+//						   NULL,
+//						   &uniform_size,
+//						   &uniform_type,
+//						   &uniform_name[0]
+//						   );
+//
+//		// add the uniform info to the list.
+//		uniforms.emplace(uniform_name, std::make_pair(uniform_size, uniform_type));
+//	}
+//}
 
-	// the size of the uniform variable in the shader program
-	int uniform_size;
-	// the type of the uniform in the shader program.
-	GLenum uniform_type;
-	// the name of the uniform in the shader program.
-	std::string uniform_name;
-	uniform_name.reserve(buffer_size);
-	
-	for ( unsigned int i = 0; i < active_uniforms; i++ )
-	{
-		glGetActiveUniform(shaderProgram,
-						   i,
-						   buffer_size,
-						   NULL,
-						   &uniform_size,
-						   &uniform_type,
-						   &uniform_name[0]
-						   );
-
-		// add the uniform info to the list.
-		uniforms.emplace(uniform_name, std::make_pair(uniform_size, uniform_type));
-	}
-}
-
-const Shader::uniform_list_t& Shader::getUniforms()
-{
-	return uniforms;
-}
-
-int Shader::getUniLoc(std::string name)
+inline int Shader::getUniLoc(std::string name)
 {
 	return glGetUniformLocation(shaderProgram, name.c_str());
 }
 
-/*
- * Vector Uniforms
- */
-template <typename T>
-void Shader::accessUniform(std::string uniform_name, T data)
+const std::string Shader::getMatrixUniformName()
 {
-	std::cout << "Error!: no specialized function for the vector type that you\
- are trying to use!" << std::endl;
-}
-
-template <>
-void Shader::accessUniform(std::string name, float data)
-{
-	glUniform1f(getUniLoc(name), data);
-}
-
-
-template <>
-void Shader::accessUniform(std::string name, glm::vec2 data)
-{
-	glUniform2f(getUniLoc(name), data.x, data.y);
-}
-
-template <>
-void Shader::accessUniform(std::string name, glm::vec3 data)
-{
-	glUniform3f(getUniLoc(name), data.x, data.y, data.z);
-}
-
-template <>
-void Shader::accessUniform(std::string name, glm::vec4 data)
-{
-	glUniform4f(getUniLoc(name), data.x, data.y, data.z, data.w);
-}
-
-template <>
-void Shader::accessUniform(std::string name, int data)
-{
-	glUniform1i(getUniLoc(name), data);
-}
-
-template <>
-void Shader::accessUniform(std::string name, glm::ivec2 data)
-{
-	glUniform2i(getUniLoc(name), data.x, data.y);
-}
-
-template <>
-void Shader::accessUniform(std::string name, glm::ivec3 data)
-{
-	glUniform3i(getUniLoc(name), data.x, data.y, data.z);
-}
-
-template <>
-void Shader::accessUniform(std::string name, glm::ivec4 data)
-{
-	glUniform4i(getUniLoc(name), data.x, data.y, data.z, data.w);
-}
-
-/*
- * Matrix Uniforms
- */
-
-template <typename T>
-void Shader::accessUniform(std::string name, GLsizei count, T)
-{
-	std::cout << "Error!: no specialized function for the matrix type that you\
- are trying to use!" << std::endl;
-}
-
-template <>
-void Shader::accessUniform(std::string name, GLsizei count, glm::mat2 data)
-{
-	glUniformMatrix2fv(getUniLoc(name), count, false, glm::value_ptr(data));
-}
-
-template <>
-void Shader::accessUniform(std::string name, GLsizei count, glm::mat3 data)
-{
-	glUniformMatrix3fv(getUniLoc(name), count, false, glm::value_ptr(data));
-}
-
-template <>
-void Shader::accessUniform(std::string name, GLsizei count, glm::mat4 data)
-{
-	glUniformMatrix4fv(getUniLoc(name), count, false, glm::value_ptr(data));
-}
-
-template <>
-void Shader::accessUniform(std::string name, GLsizei count, glm::mat2x3 data)
-{
-	glUniformMatrix2x3fv(getUniLoc(name), count, false, glm::value_ptr(data));
-}
-
-template <>
-void Shader::accessUniform(std::string name, GLsizei count, glm::mat2x4 data)
-{
-	glUniformMatrix2x4fv(getUniLoc(name), count, false, glm::value_ptr(data));
-}
-
-template <>
-void Shader::accessUniform(std::string name, GLsizei count, glm::mat3x2 data)
-{
-	glUniformMatrix3x2fv(getUniLoc(name), count, false, glm::value_ptr(data));
-}
-
-template <>
-void Shader::accessUniform(std::string name, GLsizei count, glm::mat3x4 data)
-{
-	glUniformMatrix3x4fv(getUniLoc(name), count, false, glm::value_ptr(data));
-}
-
-template <>
-void Shader::accessUniform(std::string name, GLsizei count, glm::mat4x2 data)
-{
-	glUniformMatrix3x4fv(getUniLoc(name), count, false, glm::value_ptr(data));
-}
-
-template <>
-void Shader::accessUniform(std::string name, GLsizei count, glm::mat4x3 data)
-{
-	glUniformMatrix3x4fv(getUniLoc(name), count, false, glm::value_ptr(data));
+	return matrix_uniform_name;
 }
