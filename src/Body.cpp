@@ -18,11 +18,10 @@ Body::Body() : shader_program("clip_matrix")
 	glGenBuffers(1, &EBO);
 	use_elements = false;
 
-	shader_program.grabShader(GL_VERTEX_SHADER, "../shaders/default/vertextshader.glsl");
-	shader_program.grabShader(GL_FRAGMENT_SHADER, "../shaders/default/vertextshader.glsl");
+	shader_program.grabShader(GL_VERTEX_SHADER, "/home/ethan/Projects/GameEngine/shaders/default/vertexshader.glsl");
+	shader_program.grabShader(GL_FRAGMENT_SHADER, "/home/ethan/Projects/GameEngine/shaders/default/fragmentshader.glsl");
 	shader_program.createProgram();
 }
-
 
 Body::Body(std::vector<float> *verts, GLenum usage = GL_STATIC_DRAW) : shader_program("clip_matrix")
 {
@@ -51,8 +50,8 @@ Body::Body(std::vector<float> *verts, GLenum usage = GL_STATIC_DRAW) : shader_pr
 	//  something else outside of the object class.
 	glBindVertexArray(0);
 
-	shader_program.grabShader(GL_VERTEX_SHADER, "../shaders/default/vertextshader.glsl");
-	shader_program.grabShader(GL_FRAGMENT_SHADER, "../shaders/default/vertextshader.glsl");
+	shader_program.grabShader(GL_VERTEX_SHADER, "/home/ethan/Projects/GameEngine/shaders/default/vertexshader.glsl");
+	shader_program.grabShader(GL_FRAGMENT_SHADER, "/home/ethan/Projects/GameEngine/shaders/default/fragmentshader.glsl");
 	shader_program.createProgram();
 }
 
@@ -97,8 +96,8 @@ Body::Body(std::vector<float> *verts,
 	//  something else outside of the object class.
 	glBindVertexArray(0);
 
-	shader_program.grabShader(GL_VERTEX_SHADER, "../shaders/default/vertextshader.glsl");
-	shader_program.grabShader(GL_FRAGMENT_SHADER, "../shaders/default/vertextshader.glsl");
+	shader_program.grabShader(GL_VERTEX_SHADER, "/home/ethan/Projects/GameEngine/shaders/default/vertexshader.glsl");
+	shader_program.grabShader(GL_FRAGMENT_SHADER, "/home/ethan/Projects/GameEngine/shaders/default/fragmentshader.glsl");
 	shader_program.createProgram();
 }
 
@@ -126,7 +125,7 @@ void Body::setVertexAttribute(GLuint index,
 /*!
  * Sets the shader program for the body
  */
-void Body::setShaderProgram(Shader newProgram)
+inline void Body::setShaderProgram(Shader newProgram)
 {
 	shader_program = newProgram;
 }

@@ -18,10 +18,10 @@ class Shader
 private:
 	// this is a list of all the shaders that will be made into the program
 	//  when createProgram is called
-	std::vector<GLuint> shaderObjects;
+	std::vector<GLuint> shader_objects;
 	
 	/// the handle for the shader program
-	unsigned int shaderProgram;
+	unsigned int shader_program;
 
 	/// names of all of the unforms in the shader program
 	typedef std::map<std::string, std::pair<int, GLenum>> uniform_list_t;
@@ -36,12 +36,13 @@ private:
 public:
 	/// makes sure the shader has a matrix uniform variable.
 	Shader(std::string name);
+	~Shader();
 
 	/// adds shaders to the list and compiles them.
 	void grabShader(GLenum shaderType, std::string filename);
 
 	// attaches the compiled shaders from the list, links the program, and
-	//  clears out the shaderObjects vector.
+	//  clears out the shader_objects vector.
 	void createProgram();
 
 	/// activates the program

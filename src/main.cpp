@@ -130,7 +130,6 @@ int main()
 
 		cam1.drawAll();
 
-
 		// input handler
 		processInput(window);
 

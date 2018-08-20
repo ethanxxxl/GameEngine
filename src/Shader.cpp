@@ -1,9 +1,7 @@
 #include <Shader.h>
 #include <iostream>
 #include <fstream>
-#include <sstream>
 #include <string>
-#include <tuple>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -13,109 +11,111 @@ Shader::Shader(std::string name)
 	matrix_uniform_name = name;
 }
 
-void Shader::grabShader(GLenum shaderType, std::string filename)
+void Shader::grabShader(GLenum shader_type, std::string filename)
 {
-	// creates an fstream object for the shader source. it also opens the file
-	//  for reading.
-	std::fstream shaderSourceFile(filename.c_str(), std::fstream::in);
+	// creates a filestream to grab the file source file and put it into a
+	//  stream object.
+	std::ifstream shader_source_stream(filename);
+	// moves the data from the stream object and puts it into a more workable
+	//  string object.
+	std::string shader_source_string((std::istreambuf_iterator<char>(shader_source_stream)),
+									 std::istreambuf_iterator<char>()
+									);
 
-	// this will take data from the file and bring it into something we can work
-	//  with
-	std::stringstream shaderSourceStream;
-	std::string       shaderSource; // this is so we can actually use the data
-
-	// moves the source code from the file to the stringstream
-	shaderSourceStream << shaderSourceFile.rdbuf();
-	// moves the source code from the stringstream into the shaderSource
-	//  variable
-	shaderSource = shaderSourceStream.str();
 	// this essentially converts the std::string to a c_str so that we can make
 	//  a double pointer out of it for use in an openGL function
-	const char *shaderSource_c_str = shaderSource.c_str();
+	const char *shader_source_c_str = shader_source_string.c_str();
+
+	//
+	// just a test
+	std::cout << shader_source_string << std::endl << std::endl;
+	std::cout << shader_source_string.c_str() << std::endl;
+	//
+	//
 
 	// create the shader object
-	unsigned int shaderObject;
-	shaderObject = glCreateShader(shaderType);
+	unsigned int shader_object;
+	shader_object = glCreateShader(shader_type);
 
 	// adds the shader source to the shader
-	glShaderSource(shaderObject, 1, &shaderSource_c_str, NULL);
+	glShaderSource(shader_object, 1, &shader_source_c_str, NULL);
 	// compile the shader
-	glCompileShader(shaderObject);
+	glCompileShader(shader_object);
 
 	// error checking
 	int success;
 	char infoLog[512];
-	glGetShaderiv(shaderObject, GL_COMPILE_STATUS, &success);
+	glGetShaderiv(shader_object, GL_COMPILE_STATUS, &success);
 
 	if ( !success )
 	{
-		glGetShaderInfoLog(shaderObject, 512, NULL, infoLog);
+		glGetShaderInfoLog(shader_object, 512, NULL, infoLog);
 		std::cout << "ERROR: shader compilation failed\n" << infoLog << std::endl;
 	}
 	
-	// adds the shader object to the list of shaders that are xn the "system"
-	shaderObjects.push_back(shaderObject);
+	// adds the shader object to the list of shaders that are in the "system"
+	shader_objects.push_back(shader_object);
 	
 	// closes the file because we are now done with it.
-	shaderSourceFile.close();
+	shader_source_stream.close();
 }
 
 void Shader::createProgram()
 {
 	// create the shader program
-	shaderProgram = glCreateProgram();
+	shader_program = glCreateProgram();
 
 	// this loops through all the shader object identifiers and attaches them to
 	//  the shader program
-	for ( int i = 0; i < shaderObjects.size(); i++)
+	for ( int i = 0; i < shader_objects.size(); i++)
 	{
-		glAttachShader(shaderProgram, shaderObjects[i]);
+		glAttachShader(shader_program, shader_objects[i]);
 	}
 
-	glLinkProgram(shaderProgram);
+	glLinkProgram(shader_program);
 
 	// error checking
 	int success;
 	char infoLog[512];
-	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+	glGetProgramiv(shader_program, GL_LINK_STATUS, &success);
 
 	if ( !success )
 	{
-		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+		glGetProgramInfoLog(shader_program, 512, NULL, infoLog);
 		std::cout << "Error: program linking failed\n" << infoLog << std::endl;
 	}
 	// deletes the shaders because we are no longer using them.
-	for ( int i = 0; i < shaderObjects.size(); i++)
+	for ( int i = 0; i < shader_objects.size(); i++)
 	{
-		glDeleteShader(shaderObjects[i]);
+		glDeleteShader(shader_objects[i]);
 	}
 
 	// destroys all the data in the vector because the handles are not attached
 	//  to anything anymore.
-	shaderObjects.clear();
+	shader_objects.clear();
 
 	// returns the newely created shader program
 }
 
 void Shader::useProgram()
 {
-	glUseProgram(shaderProgram);
+	glUseProgram(shader_program);
 }
 
 unsigned int Shader::getID()
 {
-	return shaderProgram;
+	return shader_program;
 }
 
 //void Shader::genUniformList()
 //{
 //	// gets the total number of active uniforms.
 //	int active_uniforms;
-//	glGetProgramiv(shaderProgram, GL_ACTIVE_UNIFORMS, &active_uniforms);
+//	glGetProgramiv(shader_program, GL_ACTIVE_UNIFORMS, &active_uniforms);
 //	// maximum size that will need allocated to store the longest uniform
 //	//  variables name.
 //	int buffer_size;
-//	glGetProgramiv(shaderProgram, GL_ACTIVE_UNIFORM_MAX_LENGTH, &buffer_size);
+//	glGetProgramiv(shader_program, GL_ACTIVE_UNIFORM_MAX_LENGTH, &buffer_size);
 //
 //	// the size of the uniform variable in the shader program
 //	int uniform_size;
@@ -127,7 +127,7 @@ unsigned int Shader::getID()
 //	
 //	for ( unsigned int i = 0; i < active_uniforms; i++ )
 //	{
-//		glGetActiveUniform(shaderProgram,
+//		glGetActiveUniform(shader_program,
 //						   i,
 //						   buffer_size,
 //						   NULL,
@@ -141,12 +141,17 @@ unsigned int Shader::getID()
 //	}
 //}
 
-inline int Shader::getUniLoc(std::string name)
+int Shader::getUniLoc(std::string name)
 {
-	return glGetUniformLocation(shaderProgram, name.c_str());
+	return glGetUniformLocation(shader_program, name.c_str());
 }
 
 const std::string Shader::getMatrixUniformName()
 {
 	return matrix_uniform_name;
+}
+
+Shader::~Shader()
+{
+	glDeleteShader(shader_program);
 }
