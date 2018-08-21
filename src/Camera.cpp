@@ -35,7 +35,7 @@ void Camera::drawAll()
 	for ( int i = 0; i < activeCamera->bodies.size(); i++ )
 	{
 		// draws each body with the cameras projection and view matrix combo
-		activeCamera->bodies.at(i)->draw(view * projection);
+		activeCamera->bodies.at(i)->draw(projection * view);
 	}
 }
 

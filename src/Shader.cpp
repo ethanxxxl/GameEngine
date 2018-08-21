@@ -26,13 +26,6 @@ void Shader::grabShader(GLenum shader_type, std::string filename)
 	//  a double pointer out of it for use in an openGL function
 	const char *shader_source_c_str = shader_source_string.c_str();
 
-	//
-	// just a test
-	std::cout << shader_source_string << std::endl << std::endl;
-	std::cout << shader_source_string.c_str() << std::endl;
-	//
-	//
-
 	// create the shader object
 	unsigned int shader_object;
 	shader_object = glCreateShader(shader_type);

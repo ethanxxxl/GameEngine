@@ -55,13 +55,7 @@ int main()
 
 	glEnable(GL_DEPTH_TEST);
 
-	/*
-	 * SHADERS
-	 */
 
-	/*
-	 * Draw Data
-	 */
 
 	std::vector<float> vertices = {
     -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
@@ -109,16 +103,10 @@ int main()
 	Body cube(&vertices, GL_STATIC_DRAW);
 	cube.setVertexAttribute(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), 0);
 
-	//Camera(glm::vec3 eye, glm::vec3 direction, float fov, float aspect, float near, float far);
-	Camera cam1(glm::vec3(2, 2, 2), glm::vec3(0, 0, 0), 45.0f, 800 / 600, 0.01f, 10.0f);
+	Camera cam1(glm::vec3(5.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), 45.0f, 800 / 600, 0.01f, 10.0f);
 	cam1.activate();
 	cam1.addBody(&cube);
 
-
-	/*
-	 * TRANSFORMATIONS
-	 */
-	
 	while ( !glfwWindowShouldClose(window) )
 	{
 		/*
