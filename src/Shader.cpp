@@ -6,6 +6,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <Uniform.h>
+
 Shader::Shader(std::string name)
 {
 	matrix_uniform_name = name;
@@ -43,7 +45,9 @@ void Shader::grabShader(GLenum shader_type, std::string filename)
 	if ( !success )
 	{
 		glGetShaderInfoLog(shader_object, 512, NULL, infoLog);
+		std::cout << filename << std::endl;
 		std::cout << "ERROR: shader compilation failed\n" << infoLog << std::endl;
+		std::cout << std::endl;
 	}
 	
 	// adds the shader object to the list of shaders that are in the "system"
@@ -143,6 +147,7 @@ const std::string Shader::getMatrixUniformName()
 {
 	return matrix_uniform_name;
 }
+
 
 Shader::~Shader()
 {

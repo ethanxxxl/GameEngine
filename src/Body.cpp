@@ -125,7 +125,7 @@ void Body::setVertexAttribute(GLuint index,
 /*!
  * Sets the shader program for the body
  */
-inline void Body::setShaderProgram(Shader newProgram)
+void Body::setShaderProgram(Shader newProgram)
 {
 	shader_program = newProgram;
 }
@@ -219,15 +219,15 @@ void Body::draw(glm::mat4 proj_view)
 
 void Body::scale(glm::vec3 magnitude)
 {
-	glm::scale(model, magnitude);
+	model = glm::scale(model, magnitude);
 }
 
 void Body::rotate(float angle, glm::vec3 axis)
 {
-	glm::rotate(model, angle, axis);
+	model = glm::rotate(model, angle, axis);
 }
 
 void Body::translate(glm::vec3 translation)
 {
-	glm::translate(model, translation);
+	model = glm::translate(model, translation);
 }
